@@ -14,9 +14,9 @@ class OrdersTable extends Migration
     public function up()
     {
         Schema::create('orders', function (Blueprint $table) {
-            $table->id('order_id');
+            $table->id();
             $table->integer('user_id');
-            $table->integer('total_price');
+            $table->double('total_price');
             $table->timestamps();
         });
     }

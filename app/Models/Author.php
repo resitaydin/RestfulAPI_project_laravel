@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Order extends Model
+class Author extends Model
 {
     use HasFactory;
 
-    protected $orders = 'orders';
+    protected $authors = 'authors';
 
-    protected $fillable = ['order_id', 'user_id', 'total_price'];
+    protected $fillable = ['author_name', 'foreign_or_local'];
 }

@@ -20,7 +20,7 @@ class CategorySeeder extends Seeder
 
         foreach ($categories as $key => $value) {
             Category::create([
-                'category_id' => $value->category_id,
+                'id' => $value->category_id,
                 'category_title' => $value->category_title
             ]);
         }

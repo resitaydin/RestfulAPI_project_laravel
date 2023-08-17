@@ -23,7 +23,7 @@ class OrderController extends Controller
         ], [
             'order_items' => 'required|array',
             'username' => 'required|exists:users,username',
-            'order_items.*.product_id' => 'required|exists:products,product_id',
+            'order_items.*.product_id' => 'required|exists:products,id',
             'order_items.*.quantity' => 'required|integer|min:1',
         ]);
 
@@ -68,7 +68,7 @@ class OrderController extends Controller
         $username = $request->input('username');
 
         foreach ($order_items as $item) {
-        
+         
             $product = Product::find($item['product_id']);
             if (!$product) {
                 return response()->json([
@@ -88,15 +88,17 @@ class OrderController extends Controller
         $user = User::where('username', $username)->first();
 
         $order = new Order([
-            'user_id' => $user->user_id,
+            'user_id' => $user->id,
             'total_price' => $total_price 
         ]);
         $order->save();
 
         foreach ($order_items as $item) {
+            $product = Product::find($item['product_id']);
             DB::table('order_products')->insert([
-                'order_id' => $order->order_id,
+                'order_id' => $order->id,
                 'product_id' => $item['product_id'],
+                'product_price' => $product->list_price,
                 'product_quantity' => $item['quantity']
             ]);
         }

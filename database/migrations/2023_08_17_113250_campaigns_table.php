@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CategoriesTable extends Migration
+class CampaignsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,9 @@ class CategoriesTable extends Migration
      */
     public function up()
     {
-        Schema::create('categories', function (Blueprint $table) {
+        Schema::create('campaigns', function (Blueprint $table) {
             $table->id();
-            $table->string('category_title');
+            $table->string('campaign_name');
             $table->timestamps();
         });
     }
@@ -27,6 +27,6 @@ class CategoriesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('categories');
+        Schema::dropIfExists('campaigns');
     }
 }

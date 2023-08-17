@@ -10,7 +10,6 @@ class Product extends Model
     use HasFactory;
 
     protected $products = 'products';
-    protected $primaryKey = 'product_id';
 
     protected $fillable = [
         'product_id' ,'title', 'category_id',

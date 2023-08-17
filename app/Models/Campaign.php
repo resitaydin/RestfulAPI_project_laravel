@@ -5,11 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Order extends Model
+class Campaign extends Model
 {
     use HasFactory;
 
-    protected $orders = 'orders';
-
-    protected $fillable = ['order_id', 'user_id', 'total_price'];
+    protected $campaings = 'campaigns';
+    protected $fillable = ['campaign_name'];
 }

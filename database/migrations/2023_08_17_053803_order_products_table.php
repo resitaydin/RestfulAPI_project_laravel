@@ -17,6 +17,7 @@ class OrderProductsTable extends Migration
             $table->id();
             $table->integer('order_id');
             $table->integer('product_id');
+            $table->double('product_price');
             $table->integer('product_quantity');
             $table->timestamps();
         });
@@ -29,6 +30,6 @@ class OrderProductsTable extends Migration
      */
     public function down()
     {
-        //
+        Schema::dropIfExists('order_products');
     }
 }
