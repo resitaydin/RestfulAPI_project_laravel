@@ -18,4 +18,4 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/index',[OrderController::class, 'index'] );
+Route::get('/allcampaigns', [OrderController::class, 'findBestCampaign']);

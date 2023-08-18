@@ -17,6 +17,7 @@ class OrdersTable extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->double('total_price');
+            $table->double('discounted_price');
             $table->timestamps();
         });
     }
