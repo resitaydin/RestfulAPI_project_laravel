@@ -9,7 +9,7 @@ class Author extends Model
 {
     use HasFactory;
 
-    protected $authors = 'authors';
+    protected $table = 'authors';
 
     protected $fillable = ['author_name', 'foreign_or_local'];
 }

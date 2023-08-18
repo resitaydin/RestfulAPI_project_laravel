@@ -87,26 +87,36 @@ class OrderController extends Controller
 
         $user = User::where('username', $username)->first();
 
-        $order = new Order([
-            'user_id' => $user->id,
-            'total_price' => $total_price 
+        $order = $user->getOrder()->create([
+            'total_price' => $total_price
         ]);
-        $order->save();
 
         foreach ($order_items as $item) {
             $product = Product::find($item['product_id']);
-            DB::table('order_products')->insert([
-                'order_id' => $order->id,
-                'product_id' => $item['product_id'],
+
+            $order->getProduct()->attach($product->id,[
                 'product_price' => $product->list_price,
-                'product_quantity' => $item['quantity']
+                'product_quantity' => $item['quantity'],
+                'created_at' => now(),
+                'updated_at' => now()
             ]);
+
+            // DB::table('order_products')->insert([
+            //     'order_id' => $order->id,
+            //     'product_id' => $product->id,
+            //     'product_price' => $product->list_price,
+            //     'product_quantity' => $product->quantity
+            // ]);
         }
         
         return response()->json([
             'message' => "$username's order is successful!",
             'total_price' => $total_price
         ], 200);
+    }
+
+    public function index(){
+        return User::find(1)->getOrder;
     }
     
 }

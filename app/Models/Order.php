@@ -2,14 +2,20 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Product;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Order extends Model
 {
     use HasFactory;
 
-    protected $orders = 'orders';
+    protected $table = 'orders';
 
-    protected $fillable = ['order_id', 'user_id', 'total_price'];
+    protected $fillable = ['user_id', 'total_price'];
+
+    public function getProduct()
+    {
+        return $this->belongsToMany(Product::class, 'order_products');
+    }
 }
