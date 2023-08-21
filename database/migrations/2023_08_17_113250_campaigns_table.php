@@ -15,9 +15,16 @@ class CampaignsTable extends Migration
     {
         Schema::create('campaigns', function (Blueprint $table) {
             $table->id();
+            $table->integer('campaign_id');
             $table->string('campaign_name');
+            $table->json('conditions')->nullable();
+            $table->integer('discount_type');
+            $table->integer('max_condition');
+            $table->integer('min_condition');
+            $table->integer('gift_condition');
             $table->timestamps();
-        });
+        }); 
+        
     }
 
     /**

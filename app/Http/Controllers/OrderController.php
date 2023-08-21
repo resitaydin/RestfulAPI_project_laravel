@@ -12,13 +12,12 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\CampaignController;
 
 class OrderController extends Controller
 {
-    public function checkOrder(Request $request) {
-        $order_items = $request->input('order_items');
-        $username = $request->input('username');
 
+    public function validateOrder($order_items, $username){
         $validator = Validator::make([
             'order_items' => $order_items,
             'username' => $username
@@ -35,16 +34,44 @@ class OrderController extends Controller
                 'errors' => $validator->errors(),
             ], 422);
         }
+    }
+
+    public function checkOrder(Request $request) {
+
+        $order_items = $request->input('order_items');
+        $username = $request->input('username');
+
+        $validationResult = $this->validateOrder($order_items, $username);
+
+        if ($validationResult instanceof JsonResponse) {
+            // Return the response object from the validateOrder method
+            return $validationResult;
+        }
+
         $out_of_stock_items = [];
+        $not_enough_stock_items = [];
 
         foreach ($order_items as $item) { // Checking for the availibility of the product by checking its stock.
             $product = Product::find($item['product_id']);
             if ($product->stock_quantity < $item['quantity']) {
-                $out_of_stock_items[] = [
+                if($product->stock_quantity == 0){
+                    $out_of_stock_items[] = [
+                        'product_title' => $product->title,
+                        'message' => "Item is out of stock!"
+                    ];
+                }
+                $not_enough_stock_items[] = [
                     'product_title' => $product->title,
-                    'message' => "Item is out of stock!"
+                    'message' => "Not enough stock for your order!"
                 ];
             }
+        }
+
+        if (!empty($not_enough_stock_items)) { // If any of the items are out of stock.
+            return response()->json([
+                'message' => "Some items are not enough to order!",
+                'not_enough_stock_items' => $not_enough_stock_items
+            ], 404);
         }
 
         if (!empty($out_of_stock_items)) { // If any of the items are out of stock.
@@ -53,7 +80,6 @@ class OrderController extends Controller
                 'out_of_stock_items' => $out_of_stock_items
             ], 404);
         }
-
         return $order_items;
     }
 
@@ -77,7 +103,7 @@ class OrderController extends Controller
                     'message' => "Product not found!"
                 ], 404);
             }
-    
+            
             $product->stock_quantity -= $item['quantity'];
             $product->save();
             $total_price += $product->list_price * $item['quantity'];
@@ -87,7 +113,7 @@ class OrderController extends Controller
             $total_price += 10; // shipping cost(cargo)
         }
 
-        $discount = $this->applyBestCampaign($order_items, $total_price);
+        $discount = (new CampaignController)->applyBestCampaign($order_items, $total_price);
 
         $discountedPrice = $total_price - $discount;
         
@@ -111,63 +137,7 @@ class OrderController extends Controller
 
         return response()->json([
             'message' => "$username's order is successful!",
-            'total_price' => $total_price
+            'total_price' => $discountedPrice
         ], 200);
     }
-
-    public function applyBestCampaign($order_items, $total_price){
-        $campaigns = Campaign::all();
-        $discountAmounts = []; 
-
-        foreach ($campaigns as $campaign) {
-            switch($campaign->id){
-                case 1: // Sabahattin Ali'nin Roman kitaplarında 2 üründen 1 tanesi bedava
-                    $counter = 0;
-                    $cheapest_book = null;
-                    foreach ($order_items as $item) {
-                        $product = Product::find($item['product_id']);
-                        if($product-> author_id == 3 && $product-> category_id == 1){
-                            $counter += $item['quantity'];
-                            if($cheapest_book==null || $product->list_price < $cheapest_book)
-                                $cheapest_book = $product->list_price;
-                        }
-                    }
-                    if($counter >= 2){
-                        $discountAmounts[] = $cheapest_book;
-                    }
-                    break;
-                case 2: //  
-                    $total_discount = 0;
-                    foreach ($order_items as $item) {
-                        $product = Product::find($item['product_id']);
-                        $author = Author::where('id', $product -> author_id) -> first();
-                        if($author->is_local){
-                            $discount = 5 * ($product->list_price) / 100; // %5 discount
-                            $total_discount += $discount * $item['quantity'];
-                        }    
-                    }
-                    $discountAmounts[] = $total_discount;
-                    
-                    break;
-                case 3:
-                    $total_discount = 0;
-                    if($total_price >= 200){
-                        $total_discount = 5 * $total_price / 100;
-                    }
-                    $discountAmounts[] = $total_discount;
-
-                    break;
-                default:
-                    break;
-            }
-        }
-        $maxDiscount = max($discountAmounts);
-
-        return $maxDiscount;
-    }
-
-    public function applyCampaign(){
-        // This function apply campaign to the user's orders and calculates the discounted price.
-    }
-    
 }

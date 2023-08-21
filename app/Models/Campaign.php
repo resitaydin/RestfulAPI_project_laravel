@@ -11,5 +11,11 @@ class Campaign extends Model
 
     protected $table = 'campaigns';
     
-    protected $fillable = ['campaign_name'];
+    protected $fillable = ['campaign_name', 'conditions', 'discount_type',
+    'max_condition','min_condition', 'gift_condition'
+    ];
+
+    protected $casts = [
+        'conditions' => 'array',
+    ];
 }

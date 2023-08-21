@@ -17,5 +17,4 @@ class Product extends Model
         'category_title', 'author', 'list_price',
         'stock_quantity'
     ];
-    
 }
